@@ -3,7 +3,6 @@ package com.wisrc.excel;
 import com.wisrc.entity.ColumnRelation;
 import com.wisrc.entity.MainTable;
 import com.wisrc.entity.SubTable;
-import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -78,9 +77,11 @@ public class ParseETLXLSXTemplate {
         String flag = row.getCell(0).toString();
         if (TARGET_NAME.equals(flag)) {
             String name = row.getCell(1).toString();
-            if (name == null || "".equals(name)) {
+            if (name == null || name.isEmpty()) {
                 logger.error("目标表不能为空");
                 return false;
+            } else if (name.endsWith(".0")) {
+                name = name.substring(0,name.length()-2);
             }
             this.targetTable = name;
             return true;
@@ -244,13 +245,23 @@ public class ParseETLXLSXTemplate {
         return procComments;
     }
 
+    // 获取存储过程注释项
     public void setProcComments(XSSFSheet sheet) {
         this.procComments = new HashMap<>();
         int maxRow = sheet.getPhysicalNumberOfRows();
-        for (int i = 3; i < maxRow; i++) {
+        for (int i = 4; i < maxRow; i++) {
             XSSFRow row = sheet.getRow(i);
             if (!MAIN_TABLE_NAME.equals(row.getCell(0).toString())) {
-                this.procComments.put(row.getCell(1).toString(), row.getCell(2).toString());
+                String key = row.getCell(1).toString();
+                if (key.endsWith(".0")) {
+                    key = key.substring(0,key.length()-2);
+                }
+
+                String value = row.getCell(2).toString();
+                if (value.endsWith(".0")){
+                    value = value.substring(0,value.length()-2);
+                }
+                this.procComments.put(key,value);
             } else {
                 break;
             }

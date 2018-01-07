@@ -36,6 +36,6 @@ public class Index {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return "ETL模板解析成功，生成ETL过程到目录/output目录下";
+        return "<div style='text-align:center'><h1>测试模板，页面仅供参考</h1><h1>生成的sql文件路径是：</h1><h2>".concat(outfile).concat("</h2></div>");
     }
 }

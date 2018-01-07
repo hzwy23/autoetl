@@ -6,10 +6,9 @@ create or replace procedure proc_etl_test123(
 
 	功能描述：	测试模板
 	作者名称：	zhanwei_huang
-	创建日期：	42736.0
+	创建日期：	42736
 	其他备注：	无
 	修改历史：	无
-	atomic.fsi_d_term_deposits：	
 	电子邮箱：	hzwy23@163.com
 
 ****************************************************/
@@ -102,7 +101,7 @@ select
 	,160                                                         	 as COMPOUND_BASIS_CD	--定期存款不考虑复利
 	,210                                                         	 as INSTRUMENT_TYPE_CD	--110:商业贷款120:消费贷款130:房屋贷款140:投资141:MBS150:信用卡210:存款220:批发融资
 	,0                                                           	 as ORG_PAYMENT_AMT	--如果没有使用反向摊还方式，这个字段填0即可
-from dp_td_acct_inf t
+from app_loan_info t
 	
 where t.as_of_date = t1.as_of_date
 ;
