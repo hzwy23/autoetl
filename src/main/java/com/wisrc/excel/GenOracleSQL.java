@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 @Repository
-public class GenSQL {
+public class GenOracleSQL {
 
     public String getSQLScript(ExcelTemplateResult template) {
         Resource resource = new ClassPathResource("templates/SQLTemplate.tpl");
@@ -74,7 +74,7 @@ public class GenSQL {
         return targetColumns;
     }
 
-    public String genExpressionColumns(List<ColumnRelation> list) {
+    private String genExpressionColumns(List<ColumnRelation> list) {
         String expColumns = "\t";
         ColumnRelation c = list.get(0);
         String exp = c.getExpression();
@@ -102,7 +102,7 @@ public class GenSQL {
         return expColumns;
     }
 
-    public String genSubTable(List<SubTable> list) {
+    private String genSubTable(List<SubTable> list) {
         String subTable = "\t";
         if (list.size() > 0) {
             SubTable first = list.get(0);

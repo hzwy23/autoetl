@@ -1,5 +1,6 @@
 package com.wisrc.excel;
 
+import com.wisrc.entity.ExcelTemplateResult;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -29,7 +30,10 @@ public class LoadExcel {
     private final Logger logger = LoggerFactory.getLogger(LoadExcel.class);
 
     @Autowired
-    private ParseETLXLSXTemplate parseETLXLSXTemplate;
+    private ParseXLSXTemplate parseXLSXTemplate;
+
+    @Autowired
+    private GenOracleSQL genOracleSQL;
 
     /**
      * 读取xlsx格式的文件
@@ -46,7 +50,9 @@ public class LoadExcel {
 
             XSSFSheet sheet = workbook.getSheetAt(0);
 
-            return parseETLXLSXTemplate.parse(sheet);
+            ExcelTemplateResult excelTemplateResult =  parseXLSXTemplate.parse(sheet);
+
+            return genOracleSQL.getSQLScript(excelTemplateResult);
 
         } catch (IOException e) {
             e.printStackTrace();

@@ -6,7 +6,6 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -14,20 +13,17 @@ import java.util.*;
 
 @Component
 @Scope("prototype")
-public class ParseETLXLSXTemplate {
+public class ParseXLSXTemplate {
 
-    private final Logger logger = LoggerFactory.getLogger(ParseETLXLSXTemplate.class);
-
-    @Autowired
-    private GenSQL genSQL;
+    private final Logger logger = LoggerFactory.getLogger(ParseXLSXTemplate.class);
 
     private ExcelTemplateResult excelTemplateResult;
 
-    public ParseETLXLSXTemplate(){
+    public ParseXLSXTemplate(){
         this.excelTemplateResult = new ExcelTemplateResult();
     }
 
-    public String parse(XSSFSheet sheet) {
+    public ExcelTemplateResult parse(XSSFSheet sheet) {
 
         XSSFRow r = sheet.getRow(0);
         if (!checkHeader(r.getCell(0).toString())) {
@@ -73,7 +69,7 @@ public class ParseETLXLSXTemplate {
         if (!flag) {
             return null;
         }
-        return genSQL.getSQLScript(this.excelTemplateResult);
+        return this.excelTemplateResult;
     }
 
     public ExcelTemplateResult getExcelTemplateResult() {
