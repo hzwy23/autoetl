@@ -1,6 +1,7 @@
 package com.wisrc.excel;
 
 import com.wisrc.entity.ColumnRelation;
+import com.wisrc.entity.ExcelTemplateResult;
 import com.wisrc.entity.SubTable;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -16,7 +17,7 @@ import java.util.Map;
 @Repository
 public class GenSQL {
 
-    public String getSQLScript(ParseETLXLSXTemplate template) {
+    public String getSQLScript(ExcelTemplateResult template) {
         Resource resource = new ClassPathResource("templates/SQLTemplate.tpl");
         try {
             Path path = resource.getFile().toPath();

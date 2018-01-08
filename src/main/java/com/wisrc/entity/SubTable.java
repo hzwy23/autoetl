@@ -1,8 +1,5 @@
 package com.wisrc.entity;
 
-import org.springframework.stereotype.Repository;
-
-@Repository
 public class SubTable {
     // 子表名
     private String tableName;

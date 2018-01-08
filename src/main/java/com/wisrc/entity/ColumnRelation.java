@@ -1,8 +1,5 @@
 package com.wisrc.entity;
 
-import org.springframework.stereotype.Repository;
-
-@Repository
 public class ColumnRelation {
     private String targetColumn;
     private String targetComments;

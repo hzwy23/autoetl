@@ -1,8 +1,5 @@
 package com.wisrc.entity;
 
-import org.springframework.stereotype.Repository;
-
-@Repository
 public class MainTable {
     private String tableName;
     private String tableAlias;
