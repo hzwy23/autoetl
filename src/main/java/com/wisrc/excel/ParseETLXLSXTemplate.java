@@ -76,12 +76,8 @@ public class ParseETLXLSXTemplate {
         return genSQL.getSQLScript(this.excelTemplateResult);
     }
 
-    private ExcelTemplateResult getExcelTemplateResult() {
+    public ExcelTemplateResult getExcelTemplateResult() {
         return excelTemplateResult;
-    }
-
-    private void setExcelTemplateResult(ExcelTemplateResult excelTemplateResult) {
-        this.excelTemplateResult = excelTemplateResult;
     }
 
     private void parseProcException(String procException) {
