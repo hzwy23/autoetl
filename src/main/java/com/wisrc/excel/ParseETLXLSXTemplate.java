@@ -17,7 +17,9 @@ import java.util.*;
 @Component
 @Scope("prototype")
 public class ParseETLXLSXTemplate {
-
+    private final String PROC_HEADER="程序头部";
+    private final String PROC_FOOTER="程序尾部";
+    private final String PROC_VARIABLE="自定义变量";
     private final String HEADER_NAME = "ETL过程配置(有色背景区域禁止修改)";
     private final String ARGUMENT_NAME = "参数列表";
     private final String PROC_NAME = "程序名";
@@ -51,8 +53,51 @@ public class ParseETLXLSXTemplate {
     // 字段映射关系
     private List<ColumnRelation> columnRelationsList;
 
+    // 变量列表
+    private String procVariable;
+    // 程序头部
+    private String procHeader;
+    // 程序尾部
+    private String procFooter;
+    // 异常处理
+    private String procException;
+
+
     @Autowired
     private GenSQL genSQL;
+
+    public String getProcHeader() {
+        return procHeader;
+    }
+
+    public String getProcException() {
+        return procException;
+    }
+
+    public String getProcVariable() {
+        return procVariable;
+    }
+
+
+    public void setProcVariable(String procVariable) {
+        this.procVariable = procVariable;
+    }
+
+    public void setProcException(String procException) {
+        this.procException = procException;
+    }
+
+    public void setProcHeader(String procHeader) {
+        this.procHeader = procHeader;
+    }
+
+    public String getProcFooter() {
+        return procFooter;
+    }
+
+    public void setProcFooter(String procFooter) {
+        this.procFooter = procFooter;
+    }
 
     public boolean checkHeader(String headName) {
         return HEADER_NAME.equals(headName);
@@ -71,6 +116,70 @@ public class ParseETLXLSXTemplate {
         }
         logger.error("第二行，第一个单元格名称应该是:{}。实际值是：{}，请检查ETL模板", PROC_NAME, flag);
         return false;
+    }
+
+    public void setProcHeader(XSSFSheet sheet){
+        Iterator<Row> iterator = sheet.rowIterator();
+        while (iterator.hasNext()) {
+            XSSFRow row = (XSSFRow) iterator.next();
+            if (PROC_HEADER.equals(row.getCell(0).toString())) {
+                this.procHeader = row.getCell(1).toString();
+                return ;
+            }
+        }
+    }
+
+    public void setProcFooter(XSSFSheet sheet){
+        Iterator<Row> iterator = sheet.rowIterator();
+        while (iterator.hasNext()) {
+            XSSFRow row = (XSSFRow) iterator.next();
+            if (PROC_FOOTER.equals(row.getCell(0).toString())) {
+                this.procFooter = row.getCell(1).toString();
+                return ;
+            }
+        }
+    }
+
+    public void setProcVariable(XSSFSheet sheet){
+        Iterator<Row> iterator = sheet.rowIterator();
+        while (iterator.hasNext()) {
+            XSSFRow row = (XSSFRow) iterator.next();
+            if (PROC_VARIABLE.equals(row.getCell(0).toString())) {
+                String mvar =  row.getCell(1).toString().trim();
+                // 如果没有定义变量，则直接推出变量处理过程
+                if(mvar.isEmpty()){
+                    this.procVariable = "";
+                    return;
+                }
+                // 如果变量没有以分号结尾，则追加分号
+                if (!mvar.endsWith(";")) {
+                    mvar += ";";
+                }
+
+                mvar = "\t" + mvar.replaceAll("\n","");
+                mvar = mvar.replaceAll(";",";\n\t");
+
+                this.procVariable = mvar;
+                return ;
+            }
+        }
+    }
+
+
+    public void setProcException(XSSFSheet sheet){
+        Iterator<Row> iterator = sheet.rowIterator();
+        while (iterator.hasNext()) {
+            XSSFRow row = (XSSFRow) iterator.next();
+            if (EXCEPTION_HANDLE_NAME.equals(row.getCell(0).toString())) {
+                String exception = row.getCell(1).toString();
+                if (exception != null && !exception.isEmpty()) {
+                    this.procException = "Exception\n"+exception.replaceAll("\n","\n\t");
+                } else {
+                    this.procException = "-- no exception handle";
+                }
+                return;
+            }
+        }
     }
 
     public boolean setTargetTable(XSSFRow row) {
@@ -165,7 +274,7 @@ public class ParseETLXLSXTemplate {
         }
         for (; index < maxRow; index++) {
             XSSFRow row = sheet.getRow(index);
-            if (!EXCEPTION_HANDLE_NAME.equals(row.getCell(0).toString())) {
+            if (!PROC_FOOTER.equals(row.getCell(0).toString())) {
                 String targetColumn = row.getCell(0).toString();
                 String targetComments = row.getCell(1).toString();
                 String expression = row.getCell(2).toString();
@@ -210,6 +319,10 @@ public class ParseETLXLSXTemplate {
             return null;
         }
 
+        setProcHeader(sheet);
+        setProcVariable(sheet);
+        setProcFooter(sheet);
+        setProcException(sheet);
         // 获取程序注释信息
         setProcComments(sheet);
 

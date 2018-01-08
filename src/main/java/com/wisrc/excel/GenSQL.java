@@ -24,6 +24,9 @@ public class GenSQL {
             String temp = new String(tp);
             temp = temp.replaceFirst("%PROC_NAME%", template.getProcName());
             temp = temp.replaceFirst("%ARGUMENT%", template.getArgument());
+            temp = temp.replaceFirst("%PROC_HEADER%", template.getProcHeader());
+            temp = temp.replaceFirst("%PROC_FOOTER%", template.getProcFooter());
+            temp = temp.replaceFirst("%PROC_VARIABLE%", template.getProcVariable());
             temp = temp.replaceFirst("%WHERE_CONDITION%", template.getWhereCondition());
             temp = temp.replaceFirst("%PROC_COMMENTS%", genProcComments(template.getProcComments()));
             temp = temp.replaceFirst("%TARGET_TABLE%", template.getTargetTable());
@@ -32,6 +35,7 @@ public class GenSQL {
             temp = temp.replaceFirst("%TARGET_COLUMNS%", genTargetColumns(template.getColumnRelationsList()));
             temp = temp.replaceFirst("%EXPRESSION_COLUMNS%", genExpressionColumns(template.getColumnRelationsList()));
             temp = temp.replaceFirst("%SUB_TABLE_CONDITION%", genSubTable(template.getSubTablesList()));
+            temp = temp.replaceFirst("%PROC_EXCEPTION%", template.getProcException());
 
             return temp;
         } catch (IOException e) {
