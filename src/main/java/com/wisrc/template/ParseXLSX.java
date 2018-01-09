@@ -1,4 +1,4 @@
-package com.wisrc.excel;
+package com.wisrc.template;
 
 import com.wisrc.entity.*;
 import org.apache.poi.ss.usermodel.Row;
@@ -13,13 +13,13 @@ import java.util.*;
 
 @Component
 @Scope("prototype")
-public class ParseXLSXTemplate {
+public class ParseXLSX {
 
-    private final Logger logger = LoggerFactory.getLogger(ParseXLSXTemplate.class);
+    private final Logger logger = LoggerFactory.getLogger(ParseXLSX.class);
 
     private ExcelTemplateResult excelTemplateResult;
 
-    public ParseXLSXTemplate(){
+    public ParseXLSX(){
         this.excelTemplateResult = new ExcelTemplateResult();
     }
 
@@ -89,12 +89,12 @@ public class ParseXLSXTemplate {
     }
 
     private boolean checkHeader(String headName) {
-        return ExcelTemplateFlag.HEADER_NAME.equals(headName);
+        return TemplateLabel.HEADER_NAME.equals(headName);
     }
 
     private boolean parseProcName(XSSFRow row) {
         String flag = row.getCell(0).toString();
-        if (ExcelTemplateFlag.PROC_NAME.equals(flag)) {
+        if (TemplateLabel.PROC_NAME.equals(flag)) {
             String name = row.getCell(1).toString();
             if (name == null || "".equals(name)) {
                 logger.error("程序名称不能为空");
@@ -103,7 +103,7 @@ public class ParseXLSXTemplate {
             excelTemplateResult.setProcName(name);
             return true;
         }
-        logger.error("第二行，第一个单元格名称应该是:{}。实际值是：{}，请检查ETL模板", ExcelTemplateFlag.PROC_NAME, flag);
+        logger.error("第二行，第一个单元格名称应该是:{}。实际值是：{}，请检查ETL模板", TemplateLabel.PROC_NAME, flag);
         return false;
     }
 
@@ -111,7 +111,7 @@ public class ParseXLSXTemplate {
         Iterator<Row> iterator = sheet.rowIterator();
         while (iterator.hasNext()) {
             XSSFRow row = (XSSFRow) iterator.next();
-            if (ExcelTemplateFlag.PROC_HEADER.equals(row.getCell(0).toString())) {
+            if (TemplateLabel.PROC_HEADER.equals(row.getCell(0).toString())) {
 
                 excelTemplateResult.setProcHeader(row.getCell(1).toString());
                 return ;
@@ -123,7 +123,7 @@ public class ParseXLSXTemplate {
         Iterator<Row> iterator = sheet.rowIterator();
         while (iterator.hasNext()) {
             XSSFRow row = (XSSFRow) iterator.next();
-            if (ExcelTemplateFlag.PROC_FOOTER.equals(row.getCell(0).toString())) {
+            if (TemplateLabel.PROC_FOOTER.equals(row.getCell(0).toString())) {
                 excelTemplateResult.setProcFooter(row.getCell(1).toString());
                 return ;
             }
@@ -134,7 +134,7 @@ public class ParseXLSXTemplate {
         Iterator<Row> iterator = sheet.rowIterator();
         while (iterator.hasNext()) {
             XSSFRow row = (XSSFRow) iterator.next();
-            if (ExcelTemplateFlag.PROC_VARIABLE.equals(row.getCell(0).toString())) {
+            if (TemplateLabel.PROC_VARIABLE.equals(row.getCell(0).toString())) {
                 String mvar =  row.getCell(1).toString().trim();
                 // 如果没有定义变量，则直接推出变量处理过程
                 if(mvar.isEmpty()){
@@ -159,7 +159,7 @@ public class ParseXLSXTemplate {
         Iterator<Row> iterator = sheet.rowIterator();
         while (iterator.hasNext()) {
             XSSFRow row = (XSSFRow) iterator.next();
-            if (ExcelTemplateFlag.EXCEPTION_HANDLE_NAME.equals(row.getCell(0).toString())) {
+            if (TemplateLabel.EXCEPTION_HANDLE_NAME.equals(row.getCell(0).toString())) {
                 String exception = row.getCell(1).toString();
                 if (exception != null && !exception.isEmpty()) {
                     String ret = "Exception\n"+exception.replaceAll("\n","\n\t");
@@ -174,7 +174,7 @@ public class ParseXLSXTemplate {
 
     private boolean parseTargetTable(XSSFRow row) {
         String flag = row.getCell(0).toString();
-        if (ExcelTemplateFlag.TARGET_NAME.equals(flag)) {
+        if (TemplateLabel.TARGET_NAME.equals(flag)) {
             String name = row.getCell(1).toString();
             if (name == null || name.isEmpty()) {
                 logger.error("目标表不能为空");
@@ -185,14 +185,14 @@ public class ParseXLSXTemplate {
             excelTemplateResult.setTargetTable(name);
             return true;
         }
-        logger.error("第三行，第一个单元格名称应该是:{}。实际值是：{}，请检查ETL模板", ExcelTemplateFlag.TARGET_NAME, flag);
+        logger.error("第三行，第一个单元格名称应该是:{}。实际值是：{}，请检查ETL模板", TemplateLabel.TARGET_NAME, flag);
         return false;
     }
 
     private void parseArgument(XSSFRow row) {
         String argument = "";
         String flag = row.getCell(0).toString();
-        if (ExcelTemplateFlag.ARGUMENT_NAME.equals(flag)) {
+        if (TemplateLabel.ARGUMENT_NAME.equals(flag)) {
             String temp = row.getCell(1).toString();
             // 去掉换行符
             temp = temp.replaceAll("\n","");
@@ -211,7 +211,7 @@ public class ParseXLSXTemplate {
         Iterator<Row> iterator = sheet.rowIterator();
         while (iterator.hasNext()) {
             XSSFRow row = (XSSFRow) iterator.next();
-            if (ExcelTemplateFlag.MAIN_TABLE_NAME.equals(row.getCell(0).toString())) {
+            if (TemplateLabel.MAIN_TABLE_NAME.equals(row.getCell(0).toString())) {
                 excelTemplateResult.setMainTable(new MainTable(row.getCell(1).toString(),
                         row.getCell(7).toString()));
                 return true;
@@ -225,7 +225,7 @@ public class ParseXLSXTemplate {
         Iterator<Row> iterator = sheet.rowIterator();
         while (iterator.hasNext()) {
             XSSFRow row = (XSSFRow) iterator.next();
-            if (ExcelTemplateFlag.SUB_TABLE_NAME.equals(row.getCell(0).toString())) {
+            if (TemplateLabel.SUB_TABLE_NAME.equals(row.getCell(0).toString())) {
 
                 String tableName = row.getCell(1).toString();
                 String tableAlias = row.getCell(3).toString();
@@ -244,7 +244,7 @@ public class ParseXLSXTemplate {
                 );
                 subTablesList.add(subTable);
             }
-            if (ExcelTemplateFlag.FILTER_WHERE.equals(row.getCell(0).toString())) {
+            if (TemplateLabel.FILTER_WHERE.equals(row.getCell(0).toString())) {
                 excelTemplateResult.setSubTablesList(subTablesList);
                 return true;
             }
@@ -259,14 +259,14 @@ public class ParseXLSXTemplate {
         int index = 3;
         for (; index < maxRow; index++) {
             XSSFRow row = sheet.getRow(index);
-            if (ExcelTemplateFlag.ETL_MAP_START_NAME.equals(row.getCell(0).toString())) {
+            if (TemplateLabel.ETL_MAP_START_NAME.equals(row.getCell(0).toString())) {
                 index = index + 3;
                 break;
             }
         }
         for (; index < maxRow; index++) {
             XSSFRow row = sheet.getRow(index);
-            if (!ExcelTemplateFlag.PROC_FOOTER.equals(row.getCell(0).toString())) {
+            if (!TemplateLabel.PROC_FOOTER.equals(row.getCell(0).toString())) {
                 String targetColumn = row.getCell(0).toString();
                 String targetComments = row.getCell(1).toString();
                 String expression = row.getCell(2).toString();
@@ -296,7 +296,7 @@ public class ParseXLSXTemplate {
         int maxRow = sheet.getPhysicalNumberOfRows();
         for (int i = 4; i < maxRow; i++) {
             XSSFRow row = sheet.getRow(i);
-            if (!ExcelTemplateFlag.MAIN_TABLE_NAME.equals(row.getCell(0).toString())) {
+            if (!TemplateLabel.MAIN_TABLE_NAME.equals(row.getCell(0).toString())) {
                 String key = row.getCell(1).toString();
                 if (key.endsWith(".0")) {
                     key = key.substring(0,key.length()-2);
@@ -318,7 +318,7 @@ public class ParseXLSXTemplate {
         Iterator<Row> iterator = sheet.rowIterator();
         while (iterator.hasNext()) {
             XSSFRow row = (XSSFRow) iterator.next();
-            if (ExcelTemplateFlag.FILTER_WHERE.equals(row.getCell(0).toString())) {
+            if (TemplateLabel.FILTER_WHERE.equals(row.getCell(0).toString())) {
                 excelTemplateResult.setWhereCondition(row.getCell(1).toString());
                 return;
             }

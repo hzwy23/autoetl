@@ -1,4 +1,4 @@
-package com.wisrc.excel;
+package com.wisrc.template;
 
 import com.wisrc.entity.ExcelTemplateResult;
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -30,7 +30,7 @@ public class LoadExcel {
     private final Logger logger = LoggerFactory.getLogger(LoadExcel.class);
 
     @Autowired
-    private ParseXLSXTemplate parseXLSXTemplate;
+    private ParseXLSX parseXLSX;
 
     @Autowired
     private GenOracleSQL genOracleSQL;
@@ -41,28 +41,29 @@ public class LoadExcel {
      *
      * @param path 打开的文件
      */
-    private String xlsx(Path path) {
+    private String xlsx(Path path) throws Exception {
 
         File file = path.toFile();
 
         try {
+
             XSSFWorkbook workbook = new XSSFWorkbook(new FileInputStream(file));
 
             XSSFSheet sheet = workbook.getSheetAt(0);
 
-            ExcelTemplateResult excelTemplateResult =  parseXLSXTemplate.parse(sheet);
+            ExcelTemplateResult excelTemplateResult =  parseXLSX.parse(sheet);
 
             return genOracleSQL.getSQLScript(excelTemplateResult);
 
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("读取模板信息失败，请检查模板地址，错误信息是：{}",e.getMessage());
+            throw new Exception("<div style='text-align:center'><h1>读取模板信息失败，请检查模板地址，</h1><h1>错误信息是</h1><h3>"+ e.getMessage() + "</h3></div>");
         }
-        return null;
     }
 
     /**
      * 读取xls根式文件
-     * 适用于office excel 97 - 2003 版本
+     * 适用于office template 97 - 2003 版本
      *
      * @param path 文件
      */
@@ -119,16 +120,17 @@ public class LoadExcel {
      *
      * @param url 文件路径
      */
-    public String load(String url) {
+    public String load(String url) throws Exception {
         if (url.endsWith("xlsx")) {
             return xlsx(Paths.get(url));
-        } else if (url.endsWith("xls")) {
-            xls(Paths.get(url));
-        } else if (url.endsWith("csv")) {
-            csv(Paths.get(url));
-        } else {
-            logger.info("不支持的数据文件格式，目前只支持3种数据文件类型：xlsx，xls，csv");
+        }  else {
+            logger.info("不支持的数据文件格式，目前只支持数据文件类型：xlsx");
+            throw new Exception("<div style='text-align:center'><h1>不支持的数据文件格式，目前只支持数据文件类型：xlsx</h1></div>");
         }
-        return null;
+//        else if (url.endsWith("xls")) {
+//            return xls(Paths.get(url));
+//        } else if (url.endsWith("csv")) {
+//            return csv(Paths.get(url));
+//        }
     }
 }

@@ -1,6 +1,6 @@
 package com.wisrc.entity;
 
-public class ExcelTemplateFlag {
+public class TemplateLabel {
     public static final String PROC_HEADER = "程序头部";
     public static final String PROC_FOOTER = "程序尾部";
     public static final String PROC_VARIABLE = "自定义变量";

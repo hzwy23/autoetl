@@ -1,4 +1,4 @@
-package com.wisrc.excel;
+package com.wisrc.template;
 
 import com.wisrc.entity.ColumnRelation;
 import com.wisrc.entity.ExcelTemplateResult;

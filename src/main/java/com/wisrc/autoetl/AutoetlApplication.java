@@ -7,7 +7,7 @@ import org.springframework.context.annotation.ComponentScan;
 @SpringBootApplication
 @ComponentScan(
         basePackages = {
-                "com.wisrc.excel",
+                "com.wisrc.template",
                 "com.wisrc.webapp"
         }
 )

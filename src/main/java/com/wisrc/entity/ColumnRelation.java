@@ -1,9 +1,13 @@
 package com.wisrc.entity;
 
 public class ColumnRelation {
+    // 目标字段
     private String targetColumn;
+    // 目标字段描述
     private String targetComments;
+    // 计算公式或字段
     private String expression;
+    // 计算公式说明
     private String expressionComments;
 
     public ColumnRelation(String targetColumn,

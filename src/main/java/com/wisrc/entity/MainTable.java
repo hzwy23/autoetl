@@ -1,7 +1,9 @@
 package com.wisrc.entity;
 
 public class MainTable {
+    // 主表名
     private String tableName;
+    // 主表别名
     private String tableAlias;
 
     public MainTable(String tableName, String tableAlias) {
