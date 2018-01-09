@@ -57,7 +57,9 @@ public class LoadExcel {
 
         } catch (IOException e) {
             logger.error("读取模板信息失败，请检查模板地址，错误信息是：{}",e.getMessage());
-            throw new Exception("<div style='text-align:center'><h1>读取模板信息失败，请检查模板地址，</h1><h1>错误信息是</h1><h3>"+ e.getMessage() + "</h3></div>");
+            throw new Exception("<div style='text-align:center'><h1>读取模板信息失败，" +
+                    "请检查模板地址，</h1><h1>错误信息是</h1><h3>"
+                    + e.getMessage() + "</h3></div>");
         }
     }
 
