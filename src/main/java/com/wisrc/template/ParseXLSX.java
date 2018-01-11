@@ -19,7 +19,7 @@ public class ParseXLSX {
 
     private ExcelTemplateResult excelTemplateResult;
 
-    public ParseXLSX(){
+    public ParseXLSX() {
         this.excelTemplateResult = new ExcelTemplateResult();
     }
 
@@ -107,37 +107,37 @@ public class ParseXLSX {
         return false;
     }
 
-    private void parseProcHeader(XSSFSheet sheet){
+    private void parseProcHeader(XSSFSheet sheet) {
         Iterator<Row> iterator = sheet.rowIterator();
         while (iterator.hasNext()) {
             XSSFRow row = (XSSFRow) iterator.next();
             if (TemplateLabel.PROC_HEADER.equals(row.getCell(0).toString())) {
 
                 excelTemplateResult.setProcHeader(row.getCell(1).toString());
-                return ;
+                return;
             }
         }
     }
 
-    private void parseProcFooter(XSSFSheet sheet){
+    private void parseProcFooter(XSSFSheet sheet) {
         Iterator<Row> iterator = sheet.rowIterator();
         while (iterator.hasNext()) {
             XSSFRow row = (XSSFRow) iterator.next();
             if (TemplateLabel.PROC_FOOTER.equals(row.getCell(0).toString())) {
                 excelTemplateResult.setProcFooter(row.getCell(1).toString());
-                return ;
+                return;
             }
         }
     }
 
-    private void parseProcVariable(XSSFSheet sheet){
+    private void parseProcVariable(XSSFSheet sheet) {
         Iterator<Row> iterator = sheet.rowIterator();
         while (iterator.hasNext()) {
             XSSFRow row = (XSSFRow) iterator.next();
             if (TemplateLabel.PROC_VARIABLE.equals(row.getCell(0).toString())) {
-                String mvar =  row.getCell(1).toString().trim();
+                String mvar = row.getCell(1).toString().trim();
                 // 如果没有定义变量，则直接推出变量处理过程
-                if(mvar.isEmpty()){
+                if (mvar.isEmpty()) {
                     excelTemplateResult.setProcVariable("");
                     return;
                 }
@@ -146,23 +146,23 @@ public class ParseXLSX {
                     mvar += ";";
                 }
 
-                mvar = "\t" + mvar.replaceAll("\n","");
-                mvar = mvar.replaceAll(";",";\n\t");
+                mvar = "\t" + mvar.replaceAll("\n", "");
+                mvar = mvar.replaceAll(";", ";\n\t");
                 excelTemplateResult.setProcVariable(mvar);
-                return ;
+                return;
             }
         }
     }
 
 
-    private void parseProcException(XSSFSheet sheet){
+    private void parseProcException(XSSFSheet sheet) {
         Iterator<Row> iterator = sheet.rowIterator();
         while (iterator.hasNext()) {
             XSSFRow row = (XSSFRow) iterator.next();
             if (TemplateLabel.EXCEPTION_HANDLE_NAME.equals(row.getCell(0).toString())) {
                 String exception = row.getCell(1).toString();
                 if (exception != null && !exception.isEmpty()) {
-                    String ret = "Exception\n"+exception.replaceAll("\n","\n\t");
+                    String ret = "Exception\n" + exception.replaceAll("\n", "\n\t");
                     excelTemplateResult.setProcException(ret);
                 } else {
                     excelTemplateResult.setProcException("-- no exception handle");
@@ -180,7 +180,7 @@ public class ParseXLSX {
                 logger.error("目标表不能为空");
                 return false;
             } else if (name.endsWith(".0")) {
-                name = name.substring(0,name.length()-2);
+                name = name.substring(0, name.length() - 2);
             }
             excelTemplateResult.setTargetTable(name);
             return true;
@@ -195,12 +195,12 @@ public class ParseXLSX {
         if (TemplateLabel.ARGUMENT_NAME.equals(flag)) {
             String temp = row.getCell(1).toString();
             // 去掉换行符
-            temp = temp.replaceAll("\n","");
+            temp = temp.replaceAll("\n", "");
             String[] tlist = temp.split(",");
             if (tlist.length > 0) {
-                argument = "\t"+tlist[0].trim();
+                argument = "\t" + tlist[0].trim();
                 for (int i = 1; i < tlist.length; i++) {
-                    argument += "\n\t," +tlist[i].trim();
+                    argument += "\n\t," + tlist[i].trim();
                 }
             }
         }
@@ -270,8 +270,8 @@ public class ParseXLSX {
                 String targetColumn = row.getCell(0).toString();
                 String targetComments = row.getCell(1).toString();
                 String expression = row.getCell(2).toString();
-                if (expression.endsWith(".0")){
-                    expression = expression.substring(0,expression.length()-2);
+                if (expression.endsWith(".0")) {
+                    expression = expression.substring(0, expression.length() - 2);
                 }
                 String expressionComments = row.getCell(6).toString();
                 ColumnRelation cr = new ColumnRelation(
@@ -292,21 +292,21 @@ public class ParseXLSX {
 
     // 获取存储过程注释项
     private void parseProcComments(XSSFSheet sheet) {
-        Map<String,String> procComments = new HashMap<>();
+        List<Comments> procComments = new ArrayList<>();
         int maxRow = sheet.getPhysicalNumberOfRows();
         for (int i = 4; i < maxRow; i++) {
             XSSFRow row = sheet.getRow(i);
             if (!TemplateLabel.MAIN_TABLE_NAME.equals(row.getCell(0).toString())) {
                 String key = row.getCell(1).toString();
                 if (key.endsWith(".0")) {
-                    key = key.substring(0,key.length()-2);
+                    key = key.substring(0, key.length() - 2);
                 }
 
                 String value = row.getCell(2).toString();
-                if (value.endsWith(".0")){
-                    value = value.substring(0,value.length()-2);
+                if (value.endsWith(".0")) {
+                    value = value.substring(0, value.length() - 2);
                 }
-                procComments.put(key,value);
+                procComments.add(new Comments(key,value));
             } else {
                 break;
             }

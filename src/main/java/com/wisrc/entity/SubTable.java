@@ -21,7 +21,7 @@ public class SubTable {
     }
 
     public String getTableName() {
-        return tableName;
+        return tableName.trim();
     }
 
     public void setTableName(String tableName) {
@@ -29,7 +29,7 @@ public class SubTable {
     }
 
     public String getJoinType() {
-        return joinType;
+        return joinType.trim();
     }
 
     public void setJoinType(String joinType) {
@@ -37,7 +37,7 @@ public class SubTable {
     }
 
     public String getTableAlias() {
-        return tableAlias;
+        return tableAlias.trim();
     }
 
     public void setTableAlias(String tableAlias) {

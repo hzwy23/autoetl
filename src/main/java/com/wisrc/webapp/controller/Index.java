@@ -33,7 +33,7 @@ public class Index {
             return e.getMessage();
         }
         // outfile 生成脚本的名称，将模板名称后缀替换成.sql类型
-        String outfile = url.replaceAll("xlsx$","sql");
+        String outfile = url.replaceAll("xlsx$", "sql");
         Path path = Paths.get(outfile);
 
         try {
@@ -42,8 +42,8 @@ public class Index {
             }
             Files.write(path, scriptFile.getBytes());
         } catch (IOException e) {
-            logger.error("创建输出文件失败：{}",e.getMessage());
-            return "<div style='text-align:center'><h1>创建输出文件失败：失败原因是：</h1><h2>"+e.getMessage()+"</h2></div>";
+            logger.error("创建输出文件失败：{}", e.getMessage());
+            return "<div style='text-align:center'><h1>创建输出文件失败：失败原因是：</h1><h2>" + e.getMessage() + "</h2></div>";
         }
         return "<div style='text-align:center'><h1>测试模板，页面仅供参考</h1><h1>生成的sql文件路径是：</h1><h2>".concat(outfile).concat("</h2></div>");
     }

@@ -12,7 +12,6 @@ import org.springframework.context.annotation.ComponentScan;
         }
 )
 public class AutoetlApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(AutoetlApplication.class, args);
     }

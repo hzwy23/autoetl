@@ -1,15 +1,17 @@
 create or replace procedure proc_etl_test123(
-	p_as_of_date date
-	,ret_msg varchar2
+	p_as_of_date in date
+	,ret_flag out varchar2
+	,ret_msg out varchar2
 )
 /**********************************************************************************
 
-	功能描述：	测试模板
 	作者名称：	zhanwei_huang
-	创建日期：	42736
-	其他备注：	无
-	修改历史：	无
 	电子邮箱：	hzwy23@163.com
+	创建日期：	2017-12-31
+	功能描述：	测试模板
+	修改历史：	测试模板央视，
+					  测试换行
+	其他备注：	无
 
 **********************************************************************************/
 as
@@ -115,7 +117,12 @@ select
 	,210                                                         	 as INSTRUMENT_TYPE_CD	--110:商业贷款120:消费贷款130:房屋贷款140:投资141:MBS150:信用卡210:存款220:批发融资
 	,0                                                           	 as ORG_PAYMENT_AMT	--如果没有使用反向摊还方式，这个字段填0即可
 from app_loan_info t
-	
+	inner join  dim_config_filter  t1
+		on substr(t.gl_account_id,1,length(t1.item_id)) = t1.item_id 
+		and t.as_of_date = t1.as_of_date
+	inner join  dim_org_info  t2
+		on t.org_unit_id = t2.org_unit_id
+		and t.as_of_date = t2.as_of_date
 where t.as_of_date = t1.as_of_date
 ;
 commit;

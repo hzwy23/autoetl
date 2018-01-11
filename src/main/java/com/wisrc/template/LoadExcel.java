@@ -51,12 +51,12 @@ public class LoadExcel {
 
             XSSFSheet sheet = workbook.getSheetAt(0);
 
-            ExcelTemplateResult excelTemplateResult =  parseXLSX.parse(sheet);
+            ExcelTemplateResult excelTemplateResult = parseXLSX.parse(sheet);
 
             return genOracleSQL.getSQLScript(excelTemplateResult);
 
         } catch (IOException e) {
-            logger.error("读取模板信息失败，请检查模板地址，错误信息是：{}",e.getMessage());
+            logger.error("读取模板信息失败，请检查模板地址，错误信息是：{}", e.getMessage());
             throw new Exception("<div style='text-align:center'><h1>读取模板信息失败，" +
                     "请检查模板地址，</h1><h1>错误信息是</h1><h3>"
                     + e.getMessage() + "</h3></div>");
@@ -125,7 +125,7 @@ public class LoadExcel {
     public String load(String url) throws Exception {
         if (url.endsWith("xlsx")) {
             return xlsx(Paths.get(url));
-        }  else {
+        } else {
             logger.info("不支持的数据文件格式，目前只支持数据文件类型：xlsx");
             throw new Exception("<div style='text-align:center'><h1>不支持的数据文件格式，目前只支持数据文件类型：xlsx</h1></div>");
         }

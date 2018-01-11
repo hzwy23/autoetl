@@ -1,7 +1,7 @@
 package com.wisrc.entity;
 
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ExcelTemplateResult {
     // 存储过程名称
@@ -11,7 +11,7 @@ public class ExcelTemplateResult {
     // 目标表名称
     private String targetTable;
     // 注释信息
-    private Map<String, String> procComments;
+    private List<Comments> procComments;
     // 主表
     private MainTable mainTable;
     // 子表信息
@@ -54,11 +54,11 @@ public class ExcelTemplateResult {
         this.targetTable = targetTable;
     }
 
-    public Map<String, String> getProcComments() {
+    public List<Comments> getProcComments() {
         return procComments;
     }
 
-    public void setProcComments(Map<String, String> procComments) {
+    public void setProcComments(List<Comments> procComments) {
         this.procComments = procComments;
     }
 
