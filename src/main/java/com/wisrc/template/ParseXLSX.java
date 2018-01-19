@@ -23,18 +23,21 @@ public class ParseXLSX {
         this.excelTemplateResult = new ExcelTemplateResult();
     }
 
-    public ExcelTemplateResult parse(XSSFSheet sheet) {
+    public ExcelTemplateResult parse(XSSFSheet sheet) throws Exception {
 
+        logger.info("开始校验ETL模板头信息");
         XSSFRow r = sheet.getRow(0);
-        if (!checkHeader(r.getCell(0).toString())) {
-            logger.error("ETL 模板的文件头(第一行)不正确，请使用ETL Template编写数据映射规则");
-            return null;
+        if (r == null
+                || !checkHeader(r.getCell(0).toString())) {
+            logger.error("ETL 模板的文件头(第一行)不正确，请使用系统给定的模板编写数据映射规则");
+            throw new Exception("ETL 模板的文件头(第一行)不正确，请使用系统给定的模板编写数据映射规则");
         }
-
+        logger.info("模板头信息校验完成，success");
         // 获取程序名称
         boolean flag = parseProcName(sheet.getRow(1));
         if (!flag) {
-            return null;
+            logger.error("模板中程序名称解析失败");
+            throw new Exception("模板中程序名称解析失败");
         }
 
         parseArgument(sheet.getRow(2));
@@ -42,7 +45,8 @@ public class ParseXLSX {
         // 获取目标表名称
         flag = parseTargetTable(sheet.getRow(3));
         if (!flag) {
-            return null;
+            logger.error("读取模板中的表名失败");
+            throw new Exception("读取模板中的表名失败");
         }
 
         parseProcHeader(sheet);
@@ -55,19 +59,22 @@ public class ParseXLSX {
         // 获取主表信息
         flag = parseMainTable(sheet);
         if (!flag) {
-            return null;
+            logger.error("获取主表名称失败");
+            throw new Exception("获取主表名称失败");
         }
 
         flag = parseSubTable(sheet);
         if (!flag) {
-            return null;
+            logger.error("获取子表信息失败");
+            throw new Exception("获取子表信息失败");
         }
 
         parseWhereCondition(sheet);
 
         flag = parseColumnRelation(sheet);
         if (!flag) {
-            return null;
+            logger.error("解析字段新设失败");
+            throw new Exception("解析字段新设失败");
         }
         return this.excelTemplateResult;
     }
