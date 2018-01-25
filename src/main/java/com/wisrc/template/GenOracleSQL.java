@@ -1,12 +1,8 @@
 package com.wisrc.template;
 
-import com.wisrc.entity.ColumnRelation;
-import com.wisrc.entity.Comments;
-import com.wisrc.entity.ExcelTemplateResult;
-import com.wisrc.entity.SubTable;
+import com.wisrc.entity.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -16,9 +12,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Stack;
 
 @Component
-@Scope("prototype")
 public class GenOracleSQL {
 
     private final Logger logger = LoggerFactory.getLogger(GenOracleSQL.class);
@@ -30,19 +26,64 @@ public class GenOracleSQL {
         logger.debug("开始解析SQL模板");
         // 解析SQL模板
         return sqlTemplate.replace("%PROC_NAME%", template.getProcName())
-                    .replace("%ARGUMENT%", template.getArgument())
-                    .replace("%PROC_HEADER%", template.getProcHeader())
-                    .replace("%PROC_FOOTER%", template.getProcFooter())
-                    .replace("%PROC_VARIABLE%", template.getProcVariable())
-                    .replace("%WHERE_CONDITION%", template.getWhereCondition())
-                    .replace("%PROC_COMMENTS%", genProcComments(template.getProcComments()))
-                    .replace("%TARGET_TABLE%", template.getTargetTable())
-                    .replace("%MAIN_TABLE%", template.getMainTable().getTableName())
-                    .replace("%MAIN_TABLE_ALIAS%", template.getMainTable().getTableAlias())
-                    .replace("%TARGET_COLUMNS%", genTargetColumns(template.getColumnRelationsList()))
-                    .replace("%EXPRESSION_COLUMNS%", genExpressionColumns(template.getColumnRelationsList()))
-                    .replace("%SUB_TABLE_CONDITION%", genSubTable(template.getSubTablesList()))
-                    .replace("%PROC_EXCEPTION%", template.getProcException());
+                .replace("%ARGUMENT%", template.getArgument())
+                .replace("%PROC_HEADER%", template.getProcHeader())
+                .replace("%PROC_FOOTER%", template.getProcFooter())
+                .replace("%PROC_VARIABLE%", template.getProcVariable())
+                .replace("%WHERE_CONDITION%", genWhereCond(template.getWhereCondition()))
+                .replace("%PROC_COMMENTS%", genProcComments(template.getProcComments()))
+                .replace("%TARGET_TABLE%", template.getTargetTable())
+                .replace("%MAIN_TABLE%", template.getMainTable().getTableName())
+                .replace("%MAIN_TABLE_ALIAS%", template.getMainTable().getTableAlias())
+                .replace("%TARGET_COLUMNS%", genTargetColumns(template.getColumnRelationsList()))
+                .replace("%EXPRESSION_COLUMNS%", genExpressionColumns(template.getColumnRelationsList()))
+                .replace("%WITH_VIEWS%", genWithViews(template.getWithViewStack()))
+                .replace("%SUB_TABLE_CONDITION%", genSubTable(template.getSubTablesList()))
+                .replace("%PROC_EXCEPTION%", template.getProcException());
+    }
+
+    private String genWithViews(Stack<WithView> stack){
+        StringBuffer strBuf = new StringBuffer("\nwith ");
+        WithView wv = null;
+
+        int i = 0;
+        while (!stack.empty()){
+            wv = stack.pop();
+            if (i > 0) {
+                strBuf.append(", ");
+            }
+            strBuf.append(wv.getTargetTable())
+                    .append(" as (\n  select\n")
+                    .append(genExpressionColumns(wv.getColumnRelationsList()))
+                    .append("\n  from ")
+                    .append(wv.getMainTable().getTableName())
+                    .append(" ")
+                    .append(wv.getMainTable().getTableAlias())
+                    .append("\n")
+                    .append(genSubTable(wv.getSubTablesList()))
+                    .append("\n  ")
+                    .append(genWhereCond(wv.getWhereCondition()))
+                    .append("\n)");
+            i++;
+        }
+
+        if (strBuf.toString().equals("\nwith ")) {
+            return "";
+        } else {
+            return strBuf.toString();
+        }
+    }
+
+    private String genWhereCond(String val){
+        if (val == null || val.isEmpty()) {
+            return "";
+        } else {
+            if (val.toUpperCase().startsWith("WHERE ")) {
+                return val;
+            } else {
+                return new StringBuffer("where ").append(val).toString();
+            }
+        }
     }
 
     private String getSQLTemplate() throws IOException {
@@ -55,7 +96,7 @@ public class GenOracleSQL {
     private String genProcComments(List<Comments> list) {
         StringBuffer comments = new StringBuffer("\n");
         for (Comments c : list) {
-            String val = c.getValue().replace("\n","\n\t\t\t\t\t  ");
+            String val = c.getValue().replace("\n", "\n\t\t\t\t\t  ");
             comments.append("\t" + c.getKey() + "：\t" + val + "\n");
         }
         return comments.toString();

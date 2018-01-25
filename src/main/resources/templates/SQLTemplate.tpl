@@ -21,7 +21,7 @@ begin
 **********************************************************************************/
 insert into %TARGET_TABLE% (
 %TARGET_COLUMNS%
-)
+) %WITH_VIEWS%
 select
 %EXPRESSION_COLUMNS%
 from %MAIN_TABLE% %MAIN_TABLE_ALIAS%

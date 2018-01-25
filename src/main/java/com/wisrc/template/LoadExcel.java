@@ -51,10 +51,7 @@ public class LoadExcel {
 
             XSSFWorkbook workbook = new XSSFWorkbook(new FileInputStream(file));
 
-            logger.info("读取第一个sheet页面");
-            XSSFSheet sheet = workbook.getSheetAt(0);
-
-            ExcelTemplateResult excelTemplateResult = parseXLSX.parse(sheet);
+            ExcelTemplateResult excelTemplateResult = parseXLSX.parse(workbook);
 
             logger.info("模板内容解析完成，开始生成SQL语句");
 
@@ -129,7 +126,7 @@ public class LoadExcel {
      */
     public String load(String url) throws Exception {
         if (url.endsWith("xlsx")) {
-            logger.info("开始解析Excel xlsx模板->: {}",url);
+            logger.info("开始解析Excel xlsx模板->: {}", url);
             return xlsx(Paths.get(url));
         } else {
             logger.info("不支持的数据文件格式，目前只支持数据文件类型：xlsx");

@@ -31,7 +31,7 @@ public class Index {
         String scriptFile = null;
         try {
             scriptFile = loadExcel.load(url);
-            logger.info("SQL存储过程生成完成，生成的程序路径是->: {}",url);
+            logger.info("SQL存储过程生成完成，生成的程序路径是->: {}", url);
         } catch (Exception e) {
             return e.getMessage();
         }

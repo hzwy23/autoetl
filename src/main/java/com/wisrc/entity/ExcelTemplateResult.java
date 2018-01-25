@@ -1,8 +1,9 @@
 package com.wisrc.entity;
 
 import java.util.List;
+import java.util.Stack;
 
-public class ExcelTemplateResult {
+public class ExcelTemplateResult extends WithView{
     // 存储过程名称
     private String procName = "";
     // 参数列表
@@ -28,6 +29,16 @@ public class ExcelTemplateResult {
     // 异常处理
     private String procException = "";
 
+    // with view 
+    private Stack<WithView> withViewStack = new Stack<>();
+
+    public Stack<WithView> getWithViewStack() {
+        return withViewStack;
+    }
+
+    public void setWithViewStack(Stack<WithView> withViewList) {
+        this.withViewStack = withViewList;
+    }
 
     public String getProcName() {
         return procName;
@@ -140,6 +151,7 @@ public class ExcelTemplateResult {
                 ", procHeader='" + procHeader + '\'' +
                 ", procFooter='" + procFooter + '\'' +
                 ", procException='" + procException + '\'' +
+                ", withViewStack=" + withViewStack +
                 '}';
     }
 }

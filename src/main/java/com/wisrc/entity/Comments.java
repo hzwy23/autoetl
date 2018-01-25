@@ -4,7 +4,7 @@ public class Comments {
     private String key;
     private String value;
 
-    public Comments(String key,String value) {
+    public Comments(String key, String value) {
         this.key = key;
         this.value = value;
     }

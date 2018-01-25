@@ -22,34 +22,83 @@ begin
 /*********************************************************************************
 *                                       程序开始                                   *
 **********************************************************************************/
-execute immediate 'truncate table FTP_PD_GL';
+execute immediate 'truncate table mas_fin_payment_current ';
 
 
 /*********************************************************************************
 *                                       数据加载                                   *
 **********************************************************************************/
-insert into FTP_PD_GL (
-	UUID                                                        	--UUID
-	,data_date                                                   	--数据日期
-	,ORGAN_CODE                                                  	--机构编号
-	,SUBJECT_CODE                                                	--科目编号
-	,CURRENCY_CODE                                               	--币种编号
-	,gl_bal                                                      	--总账余额
+insert into mas_fin_payment_current  (
+	account_number                                              	--账号
+	,next_payment_date                                           	--下次支付日期
+	,caldays                                                     	--计息天数
+	,calrate                                                     	--执行利率
+	,cur_payment                                                 	--支付本息
+	,cur_payment_principal                                       	--支付本金
+	,cur_payment_interest                                        	--支付利息
+	,cur_book_bal                                                	--剩余本金
+) 
+with vt_ext_abcd as (
+  select
+	1                                                           	 as account_number	--放款编码
+	,2                                                           	 as next_payment_date	--还款日期
+	,3                                                           	 as caldays	--计息天数
+	,4                                                           	 as calrate	--执行利率
+	,5                                                           	 as cur_payment	--支付本息
+	,6                                                           	 as cur_payment_principal	--支付本金
+	,7                                                           	 as cur_payment_interest	--支付利息
+	,8                                                           	 as cur_book_bal	--剩余本金
+	,9                                                           	 as latest_payment_date 	--数据日期最近还款日
+  from mas_fin_payment_schedule t
+	
+  where  to_date(t.payplandate,'YYYY-MM-DD') > p_as_of_date
+), vt_ext_fin_payment_schedule as (
+  select
+	regitid                                                     	 as regitid	--放款编码
+	,payplandate                                                 	 as payplandate	--还款日期
+	,caldays                                                     	 as caldays	--计息天数
+	,calrate                                                     	 as calrate	--执行利率
+	,planprinintersum                                            	 as planprinintersum   	--支付本息
+	,planprincipal                                               	 as planprincipal	--支付本金
+	,planinterest                                                	 as planinterest 	--支付利息
+	,planprincipal                                               	 as planprincipal	--剩余本金
+	,payplandate                                                 	 as payplandate	--数据日期最近还款日
+  from ext_fin_payment_schedule t
+	inner join  vt_ext_abcd  s
+		on t.regitid = s.regitid
+  where  to_date(t.payplandate,'YYYY-MM-DD') > p_as_of_date
+), vt_etl_mas_fin_payment_schedule as (
+  select
+	regitid                                                     	 as account_number	--放款编码
+	,to_date(t.payplandate ,'YYYY-MM-DD')                        	 as next_payment_date	--还款日期
+	,caldays                                                     	 as caldays	--计息天数
+	,calrate                                                     	 as calrate	--执行利率
+	,t.planprinintersum                                          	 as cur_payment	--支付本息
+	,planprincipal                                               	 as cur_payment_principal	--支付本金
+	,t.planinterest                                              	 as cur_payment_interest	--支付利息
+	,sum(t.planprincipal)  
+	     over(partition by t.regitid order by regitid desc)     	 as cur_book_bal	--剩余本金
+	,min(to_date(t.payplandate,'YYYY-MM-DD'))  over(    
+	     partition by  t.regitid 
+	     order by to_date(t.payplandate,'YYYY-MM-DD') 
+	     asc    
+	 )                                                          	 as latest_payment_date 	--数据日期最近还款日
+  from vt_ext_fin_payment_schedule t
+	
+  where  to_date(t.payplandate,'YYYY-MM-DD') > p_as_of_date
 )
 select
-	sys_guid()                                                  	 as UUID	--
-	,t.as_of_date                                                	 as data_date	--
-	,t.org_unit_id                                               	 as ORGAN_CODE	--
-	,t.gl_account_id                                             	 as SUBJECT_CODE	--
-	,t.iso_currency_cd                                           	 as CURRENCY_CODE	--
-	,case substr(t.gl_account_id,0,1) 
-	     when '1'  then t.debit_balance - t.creadit_balance
-	     when '2'  then t.creadit_balance - t.debit_balance 
-	 end
-	                                                            	 as gl_bal	--资产余额在借方，负债余额在贷方。默认情况下，只取资产负债总账数据到产品
-from mas_fin_investment_info t
+	account_number                                              	 as account_number	--账号
+	,next_payment_date                                           	 as next_payment_date	--下次支付日期
+	,caldays                                                     	 as caldays	--计息天数
+	,calrate                                                     	 as calrate	--执行利率
+	,cur_payment                                                 	 as cur_payment	--支付本息
+	,cur_payment_principal                                       	 as cur_payment_principal	--支付本金
+	,cur_payment_interest                                        	 as cur_payment_interest	--支付利息
+	,cur_book_bal                                                	 as cur_book_bal	--剩余本金
+from vt_etl_mas_fin_payment_schedule t
 	
-where t.as_of_date = p_as_of_date  and  substr(t.gl_account_id,0,1) in ('1','2')
+where  t.next_payment_date = t.latest_payment_date
 ;
 commit;
 
