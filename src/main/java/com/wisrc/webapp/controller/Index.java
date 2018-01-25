@@ -4,6 +4,7 @@ import com.wisrc.template.LoadExcel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,6 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @RestController
+@Scope("prototype")
 public class Index {
     private final Logger logger = LoggerFactory.getLogger(Index.class);
 

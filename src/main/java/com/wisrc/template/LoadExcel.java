@@ -12,6 +12,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -25,6 +26,7 @@ import java.util.List;
 
 
 @Component
+@Scope("prototype")
 public class LoadExcel {
 
     private final Logger logger = LoggerFactory.getLogger(LoadExcel.class);
@@ -58,7 +60,7 @@ public class LoadExcel {
 
             return genOracleSQL.getSQLScript(excelTemplateResult);
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.error("读取模板信息失败，请检查模板地址，错误信息是：{}", e.getMessage());
             throw new Exception("<div style='text-align:center'><h1>读取模板信息失败，" +
                     "请检查模板地址，</h1><h1>错误信息是</h1><h3>"

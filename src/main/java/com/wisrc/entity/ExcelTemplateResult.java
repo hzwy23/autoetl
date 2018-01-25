@@ -1,15 +1,14 @@
 package com.wisrc.entity;
 
-import java.util.HashMap;
 import java.util.List;
 
 public class ExcelTemplateResult {
     // 存储过程名称
-    private String procName;
+    private String procName = "";
     // 参数列表
-    private String argument;
+    private String argument = "";
     // 目标表名称
-    private String targetTable;
+    private String targetTable = "";
     // 注释信息
     private List<Comments> procComments;
     // 主表
@@ -17,17 +16,17 @@ public class ExcelTemplateResult {
     // 子表信息
     private List<SubTable> subTablesList;
     // where条件
-    private String whereCondition;
+    private String whereCondition = "";
     // 字段映射关系
     private List<ColumnRelation> columnRelationsList;
     // 变量列表
-    private String procVariable;
+    private String procVariable = "";
     // 程序头部
-    private String procHeader;
+    private String procHeader = "";
     // 程序尾部
-    private String procFooter;
+    private String procFooter = "";
     // 异常处理
-    private String procException;
+    private String procException = "";
 
 
     public String getProcName() {

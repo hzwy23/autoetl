@@ -6,9 +6,10 @@ import com.wisrc.entity.ExcelTemplateResult;
 import com.wisrc.entity.SubTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 import org.thymeleaf.util.StringUtils;
 
 import java.io.IOException;
@@ -16,18 +17,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-@Repository
+@Component
+@Scope("prototype")
 public class GenOracleSQL {
 
     private final Logger logger = LoggerFactory.getLogger(GenOracleSQL.class);
 
     public String getSQLScript(ExcelTemplateResult template) throws Exception {
-        Resource resource = new ClassPathResource("templates/SQLTemplate.tpl");
-        try {
-            Path path = resource.getFile().toPath();
-            byte[] tp = Files.readAllBytes(path);
-            String temp = new String(tp);
-            return temp.replace("%PROC_NAME%", template.getProcName())
+
+        // 读取SQL模板
+        String sqlTemplate = getSQLTemplate();
+        logger.debug("开始解析SQL模板");
+        // 解析SQL模板
+        return sqlTemplate.replace("%PROC_NAME%", template.getProcName())
                     .replace("%ARGUMENT%", template.getArgument())
                     .replace("%PROC_HEADER%", template.getProcHeader())
                     .replace("%PROC_FOOTER%", template.getProcFooter())
@@ -41,11 +43,13 @@ public class GenOracleSQL {
                     .replace("%EXPRESSION_COLUMNS%", genExpressionColumns(template.getColumnRelationsList()))
                     .replace("%SUB_TABLE_CONDITION%", genSubTable(template.getSubTablesList()))
                     .replace("%PROC_EXCEPTION%", template.getProcException());
+    }
 
-        } catch (IOException e) {
-            logger.error("根据模板生成Oracle脚本失败，错误信息是：{}", e.getMessage());
-            throw new Exception("根据模板生成Oracle脚本失败，错误信息是：".concat(e.getMessage()));
-        }
+    private String getSQLTemplate() throws IOException {
+        Resource resource = new ClassPathResource("templates/SQLTemplate.tpl");
+        Path path = resource.getFile().toPath();
+        byte[] tp = Files.readAllBytes(path);
+        return new String(tp);
     }
 
     private String genProcComments(List<Comments> list) {
