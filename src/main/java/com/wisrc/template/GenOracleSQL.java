@@ -30,7 +30,7 @@ public class GenOracleSQL {
                 .replace("%PROC_HEADER%", template.getProcHeader())
                 .replace("%PROC_FOOTER%", template.getProcFooter())
                 .replace("%PROC_VARIABLE%", template.getProcVariable())
-                .replace("%WHERE_CONDITION%", genWhereCond(template.getWhereCondition()))
+                .replace("%WHERE_CONDITION%", genWhereCond(template.getWhereCondition(),0))
                 .replace("%PROC_COMMENTS%", genProcComments(template.getProcComments()))
                 .replace("%TARGET_TABLE%", template.getTargetTable())
                 .replace("%MAIN_TABLE%", template.getMainTable().getTableName())
@@ -59,10 +59,8 @@ public class GenOracleSQL {
                     .append(wv.getMainTable().getTableName())
                     .append(" ")
                     .append(wv.getMainTable().getTableAlias())
-                    .append("\n")
                     .append(genSubTable(wv.getSubTablesList()))
-                    .append("\n  ")
-                    .append(genWhereCond(wv.getWhereCondition()))
+                    .append(genWhereCond(wv.getWhereCondition(),2))
                     .append("\n)");
             i++;
         }
@@ -74,14 +72,19 @@ public class GenOracleSQL {
         }
     }
 
-    private String genWhereCond(String val){
+    private String genWhereCond(String val,int tabSize){
         if (val == null || val.isEmpty()) {
             return "";
         } else {
+            String empty = StringUtils.repeat(" ",tabSize);
             if (val.toUpperCase().startsWith("WHERE ")) {
-                return val;
+                return "\n".concat(empty).concat(val);
             } else {
-                return new StringBuffer("where ").append(val).toString();
+                return new StringBuffer("\n")
+                        .append(empty)
+                        .append("where ")
+                        .append(val)
+                        .toString();
             }
         }
     }
@@ -152,7 +155,7 @@ public class GenOracleSQL {
     }
 
     private String genSubTable(List<SubTable> list) {
-        StringBuffer subTable = new StringBuffer("\t");
+        StringBuffer subTable = new StringBuffer("\n\t");
         if (list.size() > 0) {
             SubTable first = list.get(0);
             String cond = first.getCondition().trim();
@@ -166,6 +169,10 @@ public class GenOracleSQL {
                 subTable.append("\n\t" + s.getJoinType() + "  " + s.getTableName() + "  " + s.getTableAlias() + "\n\t\ton " + cond);
             }
         }
-        return subTable.toString();
+        if (subTable.toString().equals("\n\t")) {
+            return "";
+        }else {
+            return subTable.toString();
+        }
     }
 }

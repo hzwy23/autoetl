@@ -86,6 +86,10 @@ public class ParseXLSX {
             logger.error("获取子表信息失败");
             throw new Exception("获取子表信息失败");
         }
+        for (SubTable s : indexResult.getSubTablesList()){
+            String tb = s.getTableName();
+            parseWithViews(workbook,tb);
+        }
 
         // 获取where过滤信息
         parseWhereCondition(sheet,indexResult);

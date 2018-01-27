@@ -50,7 +50,6 @@ with vt_ext_abcd as (
 	,8                                                           	 as cur_book_bal	--剩余本金
 	,9                                                           	 as latest_payment_date 	--数据日期最近还款日
   from mas_fin_payment_schedule t
-	
   where  to_date(t.payplandate,'YYYY-MM-DD') > p_as_of_date
 ), vt_ext_fin_payment_schedule as (
   select
@@ -84,7 +83,6 @@ with vt_ext_abcd as (
 	     asc    
 	 )                                                          	 as latest_payment_date 	--数据日期最近还款日
   from vt_ext_fin_payment_schedule t
-	
   where  to_date(t.payplandate,'YYYY-MM-DD') > p_as_of_date
 )
 select
@@ -96,8 +94,7 @@ select
 	,cur_payment_principal                                       	 as cur_payment_principal	--支付本金
 	,cur_payment_interest                                        	 as cur_payment_interest	--支付利息
 	,cur_book_bal                                                	 as cur_book_bal	--剩余本金
-from vt_etl_mas_fin_payment_schedule t
-	
+from vt_etl_mas_fin_payment_schedule t  
 where  t.next_payment_date = t.latest_payment_date
 ;
 commit;
